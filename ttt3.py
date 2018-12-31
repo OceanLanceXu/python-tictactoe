@@ -1,8 +1,5 @@
 # coding=UTF8
 
-# Python TicTacToe game with Tk GUI and minimax AI
-# Author: Maurits van der Schee <maurits@vdschee.nl>
-
 import sys
 if sys.version_info >= (3, 0):
   from tkinter import Tk, Button
@@ -13,10 +10,10 @@ else:
 from copy import deepcopy
 
 class Board:
-  
+  COLOR = ['R', 'O', 'B', 'G', 'Y', 'W']
+
   def __init__(self,other=None):
-    self.player = 'x'
-    self.empty = ''
+    self.empty = -1
     self.size = 3
     self.fields = {}
     for y in range(self.size):
@@ -26,10 +23,10 @@ class Board:
     if other:
       self.__dict__ = deepcopy(other.__dict__)
       
-  def move(self,x,y):
-    board = Board(self)
-    board.fields[x,y] = board.player
-    return board
+  def cycle_color(self,x,y):
+    index = self.fields[x,y]
+    index = (index + 1) % len(Board.COLOR)
+    self.fields[x,y] = index
   
 
 class GUI:
@@ -42,8 +39,8 @@ class GUI:
     self.font = Font(family="Helvetica", size=32)
     self.buttons = {}
     for x,y in self.board.fields:
-      handler = lambda x=x,y=y: self.move(x,y)
-      button =  Button(self.app, command=handler, font=self.font, width=3, height=1)
+      handler = lambda x=x,y=y: self.cycle_color(x,y)
+      button = Button(self.app, command=handler, font=self.font, width=3, height=1)
       button.grid(row=y, column=x)
       self.buttons[x,y] = button
     handler = lambda: self.clear()
@@ -55,23 +52,23 @@ class GUI:
     self.board = Board()
     self.update()
   
-  def move(self,x,y):
+  def cycle_color(self,x,y):
     print(x, y)
     self.app.update()
-    self.board = self.board.move(x,y)
-    self.update()
+    self.board.cycle_color(x,y)
+    self.update_cell(x, y)
 
-   
-            
+  def update_cell(self, x, y):
+    color_index = self.board.fields[x,y]
+    self.buttons[x,y]['text'] = Board.COLOR[color_index]
+    self.buttons[x,y]['disabledforeground'] = 'black'
+    if color_index == self.board.empty:
+      self.buttons[x,y]['state'] = 'normal'
+      self.buttons[x,y]['text'] = ''
+
   def update(self):
     for (x,y) in self.board.fields:
-      text = self.board.fields[x,y]
-      self.buttons[x,y]['text'] = 'text'
-      self.buttons[x,y]['disabledforeground'] = 'black'
-      if text==self.board.empty:
-        self.buttons[x,y]['state'] = 'normal'
-      else:
-        self.buttons[x,y]['text'] = ''
+      self.update_cell(x, y)
 
   def mainloop(self):
     self.app.mainloop()
