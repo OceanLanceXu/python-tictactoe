@@ -10,7 +10,7 @@ else:
 from copy import deepcopy
 
 class Board:
-  COLOR = ['R', 'O', 'B', 'G', 'Y', 'W']
+  COLOR = ['red', 'orange', 'blue', 'green', 'yellow', 'white']
 
   def __init__(self,other=None):
     self.empty = -1
@@ -33,7 +33,7 @@ class GUI:
 
   def __init__(self):
     self.app = Tk()
-    self.app.title('Button Toggle')
+    self.app.title('Cube Color Changer')
     self.app.resizable(width=False, height=False)
     self.board = Board()
     self.font = Font(family="Helvetica", size=32)
@@ -60,11 +60,7 @@ class GUI:
 
   def update_cell(self, x, y):
     color_index = self.board.fields[x,y]
-    self.buttons[x,y]['text'] = Board.COLOR[color_index]
-    self.buttons[x,y]['disabledforeground'] = 'black'
-    if color_index == self.board.empty:
-      self.buttons[x,y]['state'] = 'normal'
-      self.buttons[x,y]['text'] = ''
+    self.buttons[x,y]['bg'] = Board.COLOR[color_index]
 
   def update(self):
     for (x,y) in self.board.fields:
